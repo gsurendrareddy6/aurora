@@ -1,0 +1,47 @@
+{
+    "AWSTemplateFormatVersion" : "2010-09-09",
+    "Resources":{
+    "govicloud1" : {
+       "Type" : "AWS::EC2::SecurityGroup",
+       "Properties" : {
+         "GroupName":"Allow SSH",
+         "GroupDescription" : "security group for allow ports",
+         "VpcId": "vpc-57844c2f",
+         "SecurityGroupIngress" : [ 
+          {              
+             "IpProtocol" : "tcp",
+               "FromPort" : "22",
+                "ToPort" : "22", 
+                "CidrIp" : "0.0.0.0/0"
+               },
+               {              
+                  "IpProtocol" : "tcp",
+                    "FromPort" : "80",
+                     "ToPort" : "80", 
+                     "CidrIp" : "0.0.0.0/0"
+                    }
+                ]
+            }
+     },
+   "ec2": {
+       "Type": "AWS::EC2::Instance",
+       "Properties": {
+           "KeyName": "ansible",
+           "ImageId": "ami-076e276d85f524150",
+           "InstanceType": "t2.micro",
+           "NetworkInterfaces": [{
+            "AssociatePublicIpAddress": "true",
+            "DeviceIndex": "0",     
+            "GroupSet": [{"Ref":  "govicloud1" }]
+            }],
+            "UserData" : { "Fn::Base64" : { "Fn::Join" : [" ", [
+                "#!/bin/bash -xe\n",
+                "wget https://raw.githubusercontent.com/gsurendrareddy6/aurora/master/install.sh\n",
+                "chmod +x install.sh\n",
+                "./install.sh\n"
+             ]]}}
+      }      
+    }
+   }
+   }
+   
